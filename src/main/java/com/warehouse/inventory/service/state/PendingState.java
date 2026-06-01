@@ -20,10 +20,11 @@ public class PendingState implements ReservationState {
 
         for (ReservationItem item : reservation.getItems()) {
             Inventory inventory = inventoryMap.get(item.getSku());
-            if (inventory != null) {
-                inventory.setTotalStock(inventory.getTotalStock() - item.getQuantity());
-                inventory.setReservedStock(inventory.getReservedStock() - item.getQuantity());
+            if (inventory == null) {
+                throw new IllegalStateException("Data inconsistency: Inventory not found for SKU: " + item.getSku());
             }
+            inventory.setTotalStock(inventory.getTotalStock() - item.getQuantity());
+            inventory.setReservedStock(inventory.getReservedStock() - item.getQuantity());
         }
     }
 
@@ -36,10 +37,11 @@ public class PendingState implements ReservationState {
 
         for (ReservationItem item : reservation.getItems()) {
             Inventory inventory = inventoryMap.get(item.getSku());
-            if (inventory != null) {
-                inventory.setAvailableStock(inventory.getAvailableStock() + item.getQuantity());
-                inventory.setReservedStock(inventory.getReservedStock() - item.getQuantity());
+            if (inventory == null) {
+                throw new IllegalStateException("Data inconsistency: Inventory not found for SKU: " + item.getSku());
             }
+            inventory.setAvailableStock(inventory.getAvailableStock() + item.getQuantity());
+            inventory.setReservedStock(inventory.getReservedStock() - item.getQuantity());
         }
     }
 }

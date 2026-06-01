@@ -18,6 +18,21 @@ services:
     networks:
       - warehouse-network
 
+  liquibase:
+    build: ./database
+    container_name: warehouse-liquibase
+    command: >
+      --url=jdbc:postgresql://postgres-db:5432/warehouse_db
+      --username=postgres
+      --password=postgres
+      --changeLogFile=changelog/db.changelog-master.yaml
+      update
+    depends_on:
+      postgres-db:
+        condition: service_healthy
+    networks:
+      - warehouse-network
+
   warehouse-service:
     build: .
     container_name: warehouse-service
@@ -28,8 +43,8 @@ services:
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=postgres
     depends_on:
-      postgres-db:
-        condition: service_healthy
+      liquibase:
+        condition: service_completed_successfully
     networks:
       - warehouse-network
 

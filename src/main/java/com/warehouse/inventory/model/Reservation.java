@@ -47,17 +47,25 @@ public class Reservation {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
+    @org.hibernate.annotations.UpdateTimestamp
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
     @OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     @Builder.Default
     private List<ReservationItem> items = new ArrayList<>();
 
+    private static final ReservationState PENDING_STATE = new PendingState();
+    private static final ReservationState CONFIRMED_STATE = new ConfirmedState();
+    private static final ReservationState CANCELLED_STATE = new CancelledState();
+
     public ReservationState getReservationState() {
         if (status == null) return null;
         switch (status) {
-            case PENDING: return new PendingState();
-            case CONFIRMED: return new ConfirmedState();
-            case CANCELLED: return new CancelledState();
+            case PENDING: return PENDING_STATE;
+            case CONFIRMED: return CONFIRMED_STATE;
+            case CANCELLED: return CANCELLED_STATE;
             default: throw new IllegalArgumentException("Unknown status: " + status);
         }
     }

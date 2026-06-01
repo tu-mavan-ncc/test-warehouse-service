@@ -19,9 +19,10 @@ CREATE TABLE inventory (
 
 CREATE TABLE reservations (
     id UUID PRIMARY KEY,
-    order_id VARCHAR(100) NOT NULL,
+    order_id VARCHAR(100) NOT NULL UNIQUE,
     status VARCHAR(50) NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP
 );
 
 CREATE TABLE reservation_items (
@@ -32,13 +33,6 @@ CREATE TABLE reservation_items (
     CONSTRAINT check_quantity CHECK (quantity > 0)
 );
 
--- changeset developer:2
-INSERT INTO products (sku, name, description) VALUES
-('A100', 'SKU A100 Product', 'Description of A100'),
-('B200', 'SKU B200 Product', 'Description of B200'),
-('C300', 'SKU C300 Product', 'Description of C300');
+CREATE INDEX idx_reservations_order_id ON reservations(order_id);
+CREATE INDEX idx_reservations_status ON reservations(status);
 
-INSERT INTO inventory (sku, total_stock, available_stock, reserved_stock) VALUES
-('A100', 100, 100, 0),
-('B200', 100, 100, 0),
-('C300', 10, 10, 0);
